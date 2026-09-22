@@ -1,0 +1,8 @@
+# Testa a estrutura condicional (SE É LOUCO CACHOEIRA / SÓ TRABALHADOR SÓ ZÉ POVINHO)
+MEMO idade = 20
+
+SE É LOUCO CACHOEIRA (idade >= 18)
+    É LOKO, CACHOEIRA! "sou de são paulo fi, nois rouba de pistola"
+SÓ TRABALHADOR SÓ ZÉ POVINHO
+    É LOKO, CACHOEIRA! "só trabalhador, só zé povinho"
+MEMO, CACHOEIRA, MEMO

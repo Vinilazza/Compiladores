@@ -1,0 +1,13 @@
+# Fibonacci usando a definição de função (SOU DE SÃO PAULO FI, NÓIS ROUBA DE PISTOLA)
+SOU DE SÃO PAULO FI, NÓIS ROUBA DE PISTOLA fib(n)
+    SE É LOUCO CACHOEIRA (n <= 1)
+        NÃO SOU NEM ENVOLVIDO NO CRIME n
+    MEMO, CACHOEIRA, MEMO
+    NÃO SOU NEM ENVOLVIDO NO CRIME fib(n - 1) + fib(n - 2)
+MEMO, CACHOEIRA, MEMO
+
+MEMO i = 0
+SÓ POR DEUS IRMÃO (i < 10)
+    É LOKO, CACHOEIRA! fib(i)
+    i = i + 1
+MEMO, CACHOEIRA, MEMO

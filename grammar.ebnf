@@ -1,0 +1,55 @@
+(* Gramática da linguagem CACHOEIRA, em EBNF *)
+
+programa        = { statement } ;
+
+statement       = var_decl
+                | print_stmt
+                | if_stmt
+                | while_stmt
+                | try_stmt
+                | func_def
+                | return_stmt
+                | assign_stmt
+                | expr_stmt ;
+
+var_decl        = "MEMO" IDENT "=" expr ;
+assign_stmt     = IDENT "=" expr ;
+print_stmt      = "É LOKO, CACHOEIRA!" expr ;
+expr_stmt       = expr ;
+
+if_stmt         = "SE É LOUCO CACHOEIRA" "(" expr ")"
+                    { statement }
+                  [ "SÓ TRABALHADOR SÓ ZÉ POVINHO" { statement } ]
+                  "MEMO, CACHOEIRA, MEMO" ;
+
+while_stmt      = "SÓ POR DEUS IRMÃO" "(" expr ")"
+                    { statement }
+                  "MEMO, CACHOEIRA, MEMO" ;
+
+try_stmt        = "SÓ POR DEUS IRMÃO" "TENTANDO"
+                    { statement }
+                  "EU NÃO ASSUMO ESSE B.O"
+                    { statement }
+                  "MEMO, CACHOEIRA, MEMO" ;
+
+func_def        = "SOU DE SÃO PAULO FI, NÓIS ROUBA DE PISTOLA" IDENT
+                    "(" [ IDENT { "," IDENT } ] ")"
+                    { statement }
+                  "MEMO, CACHOEIRA, MEMO" ;
+
+return_stmt     = "NÃO SOU NEM ENVOLVIDO NO CRIME" [ expr ] ;
+
+expr            = or_expr ;
+or_expr         = and_expr { "||" and_expr } ;
+and_expr        = equality { "&&" equality } ;
+equality        = comparison { ( "==" | "!=" ) comparison } ;
+comparison      = additive { ( "<" | ">" | "<=" | ">=" ) additive } ;
+additive        = multiplicative { ( "+" | "-" ) multiplicative } ;
+multiplicative  = unary { ( "*" | "/" ) unary } ;
+unary           = [ "-" | "!" ] primary ;
+primary         = NUMBER
+                | STRING
+                | "FI"
+                | "NUNCA NA VIDA"
+                | IDENT [ "(" [ expr { "," expr } ] ")" ]
+                | "(" expr ")" ;

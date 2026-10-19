@@ -120,17 +120,16 @@ No site, o playground tem um seletor de linguagem de destino.
 
 ## Site / playground (GitHub Pages ou Vercel)
 
-A pasta `docs/` tem a landing page com um **playground** que roda o
+A pasta `docs/` é o site: landing page com um **playground** que roda o
 interpretador Python direto no navegador (via [Pyodide](https://pyodide.org)),
-sem servidor. `scripts/build_site.sh` monta o site estático em `_site/`
-(landing + código + exemplos).
+sem servidor, e traduz para Python/JavaScript/Lua/Ruby. Ela traz cópias do
+código (`docs/cachoeira/`, `docs/examples/`) geradas por
+`bash scripts/build_site.sh` — **rode e commite depois de mexer em `src/` ou
+`examples/`** (um teste avisa se estiver desatualizado).
 
-- **GitHub Pages:** em *Settings → Pages → Source* escolha **GitHub Actions**;
-  o workflow `.github/workflows/pages.yml` roda os testes e publica a cada
-  push na `main`.
-- **Vercel:** importe o repositório; o `vercel.json` já define o build
-  (`bash scripts/build_site.sh`) e a saída (`_site`).
-- **Local:** `bash scripts/build_site.sh && python3 -m http.server -d _site`.
+- **GitHub Pages:** *Settings → Pages → Deploy from a branch →* branch base, pasta `/docs`.
+- **Vercel:** importe o repositório; o `vercel.json` já aponta `outputDirectory: docs`.
+- **Local:** `python3 -m http.server -d docs` e abra `http://localhost:8000`.
 
 ## Arquitetura do compilador/interpretador
 

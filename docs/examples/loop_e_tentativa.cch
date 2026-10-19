@@ -1,0 +1,15 @@
+# Testa o laço (SÓ POR DEUS IRMÃO) e tratamento de erro (TENTANDO / EU NÃO ASSUMO ESSE B.O)
+MEMO i = 0
+SÓ POR DEUS IRMÃO (i < 5)
+    É LOKO, CACHOEIRA! i
+    i = i + 1
+MEMO, CACHOEIRA, MEMO
+
+MEMO a = 10
+MEMO b = 0
+
+SÓ POR DEUS IRMÃO TENTANDO
+    É LOKO, CACHOEIRA! a / b
+EU NÃO ASSUMO ESSE B.O
+    É LOKO, CACHOEIRA! "eu não assumo esse B.O, mas rolou divisão por zero"
+MEMO, CACHOEIRA, MEMO

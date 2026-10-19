@@ -50,6 +50,19 @@ class TestTradutor(unittest.TestCase):
         self.assertEqual(traduzir("É LOKO, CACHOEIRA! 1", "js"), traduzir("É LOKO, CACHOEIRA! 1", "javascript"))
 
 
+class TestSiteSincronizado(unittest.TestCase):
+    def test_docs_tem_copia_atual_do_codigo(self):
+        raiz = Path(__file__).parent.parent
+        for arq in (raiz / "src" / "cachoeira").glob("*.py"):
+            copia = raiz / "docs" / "cachoeira" / arq.name
+            self.assertTrue(copia.exists() and copia.read_bytes() == arq.read_bytes(),
+                            f"docs/cachoeira/{arq.name} desatualizado — rode scripts/build_site.sh")
+        for arq in (raiz / "examples").glob("*.cch"):
+            copia = raiz / "docs" / "examples" / arq.name
+            self.assertTrue(copia.exists() and copia.read_bytes() == arq.read_bytes(),
+                            f"docs/examples/{arq.name} desatualizado — rode scripts/build_site.sh")
+
+
 def _criar_teste(alvo):
     def teste(self):
         cmd = COMANDOS[alvo]

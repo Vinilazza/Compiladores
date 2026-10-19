@@ -48,7 +48,14 @@ class Interpreter:
         self.out = out
 
     def run(self, program: ast.Program):
-        self.exec_block(program.statements, self.globals)
+        try:
+            self.exec_block(program.statements, self.globals)
+        except ReturnSignal:
+            raise CachoeiraRuntimeError(
+                "'NÃO SOU NEM ENVOLVIDO NO CRIME' fora de uma função — não tem de onde sair"
+            )
+        except RecursionError:
+            raise CachoeiraRuntimeError("recursão infinita — a fuga nunca acaba")
 
     # ---------- execução de statements ----------
     def exec_block(self, statements, env):
@@ -84,7 +91,7 @@ class Interpreter:
     def exec_Try(self, stmt, env):
         try:
             self.exec_block(stmt.try_body, Environment(env))
-        except CachoeiraRuntimeError:
+        except (CachoeiraRuntimeError, RecursionError):
             self.exec_block(stmt.catch_body, Environment(env))
 
     def exec_FuncDef(self, stmt, env):
@@ -111,6 +118,8 @@ class Interpreter:
     def eval_UnaryOp(self, node, env):
         value = self.eval(node.expr, env)
         if node.op == "-":
+            if not is_number(value):
+                raise CachoeiraRuntimeError(f"Linha {node.line}: só dá pra negar número")
             return -value
         if node.op == "!":
             return not is_truthy(value)
@@ -133,12 +142,18 @@ class Interpreter:
         op = node.op
         try:
             if op == "+":
+                if isinstance(left, str) or isinstance(right, str):
+                    return to_display(left) + to_display(right)
+                check_numbers(left, right, node.line)
                 return left + right
             if op == "-":
+                check_numbers(left, right, node.line)
                 return left - right
             if op == "*":
+                check_numbers(left, right, node.line)
                 return left * right
             if op == "/":
+                check_numbers(left, right, node.line)
                 if right == 0:
                     raise CachoeiraRuntimeError(
                         f"Linha {node.line}: divisão por zero — nem por deus irmão isso vai colar"
@@ -148,6 +163,11 @@ class Interpreter:
                 return left == right
             if op == "!=":
                 return left != right
+            if op in ("<", ">", "<=", ">="):
+                if not (is_number(left) and is_number(right)) and not (
+                    isinstance(left, str) and isinstance(right, str)
+                ):
+                    raise CachoeiraRuntimeError(f"Linha {node.line}: não dá pra comparar esses valores")
             if op == "<":
                 return left < right
             if op == ">":
@@ -185,6 +205,15 @@ class Interpreter:
         return None
 
 
+def is_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def check_numbers(left, right, line):
+    if not (is_number(left) and is_number(right)):
+        raise CachoeiraRuntimeError(f"Linha {line}: operação aritmética só vale pra número")
+
+
 def is_truthy(value):
     if value is None:
         return False
@@ -198,12 +227,16 @@ def to_display(value):
         return "NUNCA NA VIDA"
     if value is None:
         return "NUNCA NA VIDA"
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
     return str(value)
 
 
 def _builtin_tamanho(args, line):
     if len(args) != 1:
         raise CachoeiraRuntimeError(f"Linha {line}: TAMANHO espera 1 argumento")
+    if not isinstance(args[0], str):
+        raise CachoeiraRuntimeError(f"Linha {line}: TAMANHO só funciona com texto")
     return len(args[0])
 
 

@@ -99,6 +99,20 @@ Rodar os testes:
 python3 -m unittest tests/test_cachoeira.py -v
 ```
 
+## Site / playground (GitHub Pages ou Vercel)
+
+A pasta `docs/` tem a landing page com um **playground** que roda o
+interpretador Python direto no navegador (via [Pyodide](https://pyodide.org)),
+sem servidor. `scripts/build_site.sh` monta o site estático em `_site/`
+(landing + código + exemplos).
+
+- **GitHub Pages:** em *Settings → Pages → Source* escolha **GitHub Actions**;
+  o workflow `.github/workflows/pages.yml` roda os testes e publica a cada
+  push na `main`.
+- **Vercel:** importe o repositório; o `vercel.json` já define o build
+  (`bash scripts/build_site.sh`) e a saída (`_site`).
+- **Local:** `bash scripts/build_site.sh && python3 -m http.server -d _site`.
+
 ## Arquitetura do compilador/interpretador
 
 O pipeline é o clássico de um interpretador de matéria de Compiladores:

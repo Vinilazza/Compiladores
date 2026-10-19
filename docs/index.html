@@ -191,6 +191,22 @@
     font-size: 14px;
   }
   .quote-list li { margin-bottom: 6px; }
+
+  .playground textarea {
+    width: 100%; min-height: 220px; resize: vertical;
+    background: var(--code-bg); color: #e8e6df;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; font: 13.5px/1.55 "SFMono-Regular", Consolas, Menlo, monospace;
+  }
+  .playground .bar { display: flex; gap: 10px; margin: 12px 0; flex-wrap: wrap; align-items: center; }
+  .playground select, .playground button {
+    font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--card); color: var(--text);
+  }
+  .playground button.run { background: var(--accent); color: #14151a; border-color: var(--accent); font-weight: 600; cursor: pointer; }
+  .playground button.run:disabled { opacity: .5; cursor: wait; }
+  #saida { min-height: 60px; white-space: pre-wrap; }
+  #saida.erro { color: var(--danger); }
 </style>
 </head>
 <body>
@@ -302,6 +318,18 @@
 <span class="kw">MEMO, CACHOEIRA, MEMO</span></code></pre>
   </section>
 
+  <section id="playground" class="playground">
+    <h2>Playground</h2>
+    <p class="section-sub">roda de verdade no seu navegador (o interpretador em Python via Pyodide) — nada vai pra servidor</p>
+    <textarea id="codigo" spellcheck="false">MEMO nome = "cachoeira"
+É LOKO, CACHOEIRA! "é loko, " + nome</textarea>
+    <div class="bar">
+      <button class="run" id="rodar" disabled>Carregando…</button>
+      <select id="exemplos" aria-label="Exemplos"><option value="">— carregar exemplo —</option></select>
+    </div>
+    <pre id="saida"></pre>
+  </section>
+
   <section>
     <h2>Como rodar</h2>
     <p class="section-sub">só precisa de Python 3, sem dependências</p>
@@ -344,5 +372,51 @@ python3 main.py examples/fibonacci.cch</code></pre>
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+(async () => {
+  const $ = (id) => document.getElementById(id);
+  const btn = $("rodar"), out = $("saida"), code = $("codigo"), sel = $("exemplos");
+  try {
+    const exs = await (await fetch("examples/index.json")).json();
+    for (const f of exs) sel.add(new Option(f, f));
+    sel.onchange = async () => {
+      if (sel.value) code.value = await (await fetch("examples/" + sel.value)).text();
+    };
+    const py = await loadPyodide();
+    const files = ["__init__", "errors", "ast_nodes", "lexer", "parser", "interpreter"];
+    py.FS.mkdir("/home/pyodide/cachoeira");
+    for (const f of files) {
+      const txt = await (await fetch(`cachoeira/${f}.py`)).text();
+      py.FS.writeFile(`/home/pyodide/cachoeira/${f}.py`, txt);
+    }
+    py.runPython(`
+import sys
+sys.path.insert(0, "/home/pyodide")
+from cachoeira import run_source, CachoeiraSyntaxError, CachoeiraRuntimeError
+def executar(src):
+    saida = []
+    erro = None
+    try:
+        run_source(src, out=saida.append)
+    except CachoeiraSyntaxError as e:
+        erro = f"[erro de sintaxe] {e}"
+    except CachoeiraRuntimeError as e:
+        erro = f"[erro em tempo de execução] {e}"
+    return "\\n".join(saida), erro
+`);
+    const executar = py.globals.get("executar");
+    btn.textContent = "Rodar"; btn.disabled = false;
+    btn.onclick = () => {
+      const [saida, erro] = executar(code.value).toJs();
+      out.className = erro ? "erro" : "";
+      out.textContent = erro ? (saida ? saida + "\n" : "") + erro : saida;
+    };
+  } catch (e) {
+    btn.textContent = "Falhou ao carregar";
+    out.className = "erro"; out.textContent = String(e);
+  }
+})();
+</script>
 </body>
 </html>

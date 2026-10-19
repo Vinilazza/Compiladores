@@ -14,7 +14,14 @@ def main():
         sys.exit(1)
 
     path = Path(sys.argv[1])
-    source = path.read_text(encoding="utf-8")
+    try:
+        source = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        print(f"[erro] não consegui abrir '{path}': {exc.strerror}")
+        sys.exit(1)
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
 
     try:
         run_source(source)

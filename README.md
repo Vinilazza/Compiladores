@@ -96,8 +96,41 @@ python3 main.py examples/fibonacci.cch
 Rodar os testes:
 
 ```bash
-python3 -m unittest tests/test_cachoeira.py -v
+python3 -m unittest discover -s tests -v
 ```
+
+## Traduzir para outras linguagens
+
+O mesmo AST que o interpretador usa alimenta um gerador de código
+(`src/cachoeira/codegen.py`). Alvos: **Python, JavaScript, Lua e Ruby**
+(linguagens dinâmicas, como a CACHOEIRA; C/Java/Go exigiriam inferência de tipos).
+
+```bash
+python3 main.py examples/fibonacci.cch --para python
+python3 main.py examples/fibonacci.cch --para javascript -o fib.js
+```
+
+A saída leva um pequeno prelúdio (`cch_mostrar`, `cch_soma`, `cch_div`, ...) que
+preserva as regras da CACHOEIRA (`FI`/`NUNCA NA VIDA`, `+` concatena texto,
+divisão por zero é erro, `0` e `""` são falsos). Os testes rodam o código
+traduzido e comparam com a saída do interpretador. Limitação conhecida: em
+Python e Ruby, um `MEMO x` dentro de um bloco com o mesmo nome de uma variável
+de fora sobrescreve a de fora (nessas linguagens `if`/`while` não criam escopo).
+No site, o playground tem um seletor de linguagem de destino.
+
+## Site / playground (GitHub Pages ou Vercel)
+
+A pasta `docs/` tem a landing page com um **playground** que roda o
+interpretador Python direto no navegador (via [Pyodide](https://pyodide.org)),
+sem servidor. `scripts/build_site.sh` monta o site estático em `_site/`
+(landing + código + exemplos).
+
+- **GitHub Pages:** em *Settings → Pages → Source* escolha **GitHub Actions**;
+  o workflow `.github/workflows/pages.yml` roda os testes e publica a cada
+  push na `main`.
+- **Vercel:** importe o repositório; o `vercel.json` já define o build
+  (`bash scripts/build_site.sh`) e a saída (`_site`).
+- **Local:** `bash scripts/build_site.sh && python3 -m http.server -d _site`.
 
 ## Arquitetura do compilador/interpretador
 

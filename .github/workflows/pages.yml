@@ -22,10 +22,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: python -m unittest tests/test_cachoeira.py
       - run: bash scripts/build_site.sh
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

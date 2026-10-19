@@ -83,6 +83,50 @@ class TestCachoeira(unittest.TestCase):
         with self.assertRaises(CachoeiraSyntaxError):
             run("MEMO x 10")
 
+    def test_divisao_exata_sem_ponto_zero(self):
+        self.assertEqual(run("É LOKO, CACHOEIRA! 10 / 2"), ["5"])
+        self.assertEqual(run("É LOKO, CACHOEIRA! 1 / 2"), ["0.5"])
+
+    def test_concatenacao_de_texto(self):
+        self.assertEqual(run('É LOKO, CACHOEIRA! "n: " + 3'), ["n: 3"])
+
+    def test_aritmetica_invalida_vira_erro_capturavel(self):
+        out = run(
+            "SÓ POR DEUS IRMÃO TENTANDO\n"
+            '    É LOKO, CACHOEIRA! -"a"\n'
+            "EU NÃO ASSUMO ESSE B.O\n"
+            '    É LOKO, CACHOEIRA! "pego"\n'
+            "MEMO, CACHOEIRA, MEMO\n"
+        )
+        self.assertEqual(out, ["pego"])
+
+    def test_return_fora_de_funcao(self):
+        with self.assertRaises(CachoeiraRuntimeError):
+            run("NÃO SOU NEM ENVOLVIDO NO CRIME 1")
+
+    def test_return_sem_valor(self):
+        out = run(
+            "SOU DE SÃO PAULO FI, NÓIS ROUBA DE PISTOLA f()\n"
+            "    NÃO SOU NEM ENVOLVIDO NO CRIME\n"
+            "MEMO, CACHOEIRA, MEMO\n"
+            "MEMO x = f()\n"
+            "É LOKO, CACHOEIRA! x\n"
+        )
+        self.assertEqual(out, ["NUNCA NA VIDA"])
+
+    def test_recursao_infinita_vira_erro(self):
+        with self.assertRaises(CachoeiraRuntimeError):
+            run(
+                "SOU DE SÃO PAULO FI, NÓIS ROUBA DE PISTOLA f()\n"
+                "    NÃO SOU NEM ENVOLVIDO NO CRIME f()\n"
+                "MEMO, CACHOEIRA, MEMO\n"
+                "f()\n"
+            )
+
+    def test_exemplos_rodam(self):
+        for path in sorted((Path(__file__).parent.parent / "examples").glob("*.cch")):
+            run(path.read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()

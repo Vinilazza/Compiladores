@@ -124,9 +124,9 @@ class Parser:
     def parse_return(self):
         line = self.expect("RETURN").line
         expr = None
-        if self.peek().type not in BLOCK_ENDERS and self.peek().type not in (
-            "VAR", "PRINT", "IF", "WHILE_OR_TRY", "FUNC", "RETURN",
-        ):
+        nxt = self.peek()
+        # "return" sem valor: o que vem na linha seguinte é outro statement
+        if nxt.line == line and nxt.type not in BLOCK_ENDERS:
             expr = self.parse_expr()
         return ast.Return(expr, line)
 
